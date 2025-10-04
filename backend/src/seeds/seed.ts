@@ -1,4 +1,4 @@
-import { PrismaClient, Difficulty, CorrectOption } from '../generated/prisma';
+import { PrismaClient, Difficulty, CorrectOption } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
