@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Quiz {
+  id            String     @id @default(cuid())
+  title         String
+  description   String
+  category      String
+  difficulty    Difficulty
+  questionCount Int        @map("question_count")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  questions Question[]
+
+  @@map("quizzes")
+}
+
+model Question {
+  id            String        @id @default(cuid())
+  quizId        String        @map("quiz_id")
+  questionText  String        @map("question_text")
+  optionA       String        @map("option_a")
+  optionB       String        @map("option_b")
+  optionC       String        @map("option_c")
+  optionD       String        @map("option_d")
+  correctOption CorrectOption @map("correct_option")
+  orderIndex    Int           @map("order_index")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@map("questions")
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
+
+enum CorrectOption {
+  a
+  b
+  c
+  d
+}
