@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Question, OptionKey, QuizResult, Quiz } from '../types/quiz';
 
-interface CreateQuizData {
+export interface CreateQuizData {
   title: string;
   description: string;
   category: string;
@@ -9,7 +9,7 @@ interface CreateQuizData {
   questionCount: number;
 }
 
-interface UpdateQuizData {
+export interface UpdateQuizData {
   title?: string;
   description?: string;
   category?: string;
@@ -17,7 +17,7 @@ interface UpdateQuizData {
   questionCount?: number;
 }
 
-interface CreateQuestionData {
+export interface CreateQuestionData {
   quizId: string;
   questionText: string;
   optionA: string;
@@ -28,7 +28,7 @@ interface CreateQuestionData {
   orderIndex: number;
 }
 
-interface UpdateQuestionData {
+export interface UpdateQuestionData {
   questionText?: string;
   optionA?: string;
   optionB?: string;
@@ -197,5 +197,179 @@ export const useQuizStore = create<QuizState>((set, get) => ({
 
   updateTimeElapsed: (time: number) => {
     set({ timeElapsed: time });
+  },
+
+  // Quiz CRUD operations
+  createQuiz: async (data: CreateQuizData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`${API_BASE_URL}/quizzes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create quiz');
+      }
+
+      const newQuiz = await response.json();
+      set(state => ({
+        quizzes: [...state.quizzes, newQuiz],
+        isLoading: false,
+      }));
+      return newQuiz;
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'An error occurred',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  updateQuiz: async (id: string, data: UpdateQuizData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`${API_BASE_URL}/quizzes/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update quiz');
+      }
+
+      const updatedQuiz = await response.json();
+      set(state => ({
+        quizzes: state.quizzes.map(quiz =>
+          quiz.id === id ? updatedQuiz : quiz
+        ),
+        isLoading: false,
+      }));
+      return updatedQuiz;
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'An error occurred',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  deleteQuiz: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`${API_BASE_URL}/quizzes/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete quiz');
+      }
+
+      set(state => ({
+        quizzes: state.quizzes.filter(quiz => quiz.id !== id),
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'An error occurred',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Question CRUD operations
+  createQuestion: async (data: CreateQuestionData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`${API_BASE_URL}/questions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create question');
+      }
+
+      // If the question belongs to the currently selected quiz, refetch questions
+      const { selectedQuizId } = get();
+      if (selectedQuizId === data.quizId) {
+        await get().fetchQuestions(selectedQuizId);
+      }
+
+      set({ isLoading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'An error occurred',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  updateQuestion: async (id: string, data: UpdateQuestionData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`${API_BASE_URL}/questions/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update question');
+      }
+
+      const updatedQuestion = await response.json();
+      set(state => ({
+        questions: state.questions.map(question =>
+          question.id === id ? { ...question, ...updatedQuestion } : question
+        ),
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'An error occurred',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  deleteQuestion: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`${API_BASE_URL}/questions/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete question');
+      }
+
+      set(state => ({
+        questions: state.questions.filter(question => question.id !== id),
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'An error occurred',
+        isLoading: false,
+      });
+      throw error;
+    }
   },
 }));

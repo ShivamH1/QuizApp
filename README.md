@@ -4,12 +4,19 @@ A full-stack quiz application built with React (frontend) and Express (backend),
 
 ## 🚀 Features
 
+### User Features
 - **Multiple Quizzes**: Choose from various quiz categories
 - **Real-time Timer**: Track time taken to complete quizzes
 - **Instant Feedback**: Get immediate results after submission
 - **Detailed Results**: View your answers compared to correct answers
 - **Beautiful UI**: Modern, responsive design using Tailwind CSS and Radix UI components
 - **State Management**: Efficient state management with Zustand
+
+### Admin Features
+- **Full CRUD Operations**: Create, Read, Update, and Delete quizzes
+- **Question Management**: Add, edit, and remove questions from quizzes
+- **Complete API Integration**: All backend endpoints are integrated in the frontend
+- **Type-Safe Operations**: TypeScript types for all CRUD operations
 
 ## 🏗️ Architecture
 
@@ -140,20 +147,20 @@ npm run build:frontend
 ## 📡 API Endpoints
 
 ### Quizzes
-- `GET /api/quizzes` - Get all quizzes
-- `GET /api/quizzes/:id` - Get quiz by ID
-- `POST /api/quizzes` - Create a new quiz
-- `PUT /api/quizzes/:id` - Update a quiz
-- `DELETE /api/quizzes/:id` - Delete a quiz
+- ✅ `GET /api/quizzes` - Get all quizzes
+- ✅ `GET /api/quizzes/:id` - Get quiz by ID
+- ✅ `POST /api/quizzes` - Create a new quiz
+- ✅ `PUT /api/quizzes/:id` - Update a quiz
+- ✅ `DELETE /api/quizzes/:id` - Delete a quiz
 
 ### Questions
-- `GET /api/questions?quizId={id}` - Get all questions for a quiz
-- `POST /api/questions` - Create a new question
-- `PUT /api/questions/:id` - Update a question
-- `DELETE /api/questions/:id` - Delete a question
+- ✅ `GET /api/questions?quizId={id}` - Get all questions for a quiz
+- ✅ `POST /api/questions` - Create a new question
+- ✅ `PUT /api/questions/:id` - Update a question
+- ✅ `DELETE /api/questions/:id` - Delete a question
 
 ### Quiz Submission
-- `POST /api/submit` - Submit quiz answers and get results
+- ✅ `POST /api/submit` - Submit quiz answers and get results
   ```json
   {
     "quizId": "quiz-id",
@@ -166,7 +173,9 @@ npm run build:frontend
   ```
 
 ### Health Check
-- `GET /health` - Server health status
+- ✅ `GET /health` - Server health status
+
+**All endpoints are fully integrated in the frontend!** See [CRUD_OPERATIONS.md](CRUD_OPERATIONS.md) for usage examples.
 
 ## 🗄️ Database Management
 
@@ -202,15 +211,25 @@ Quiz Application/
 │   └── package.json
 ├── frontend/
 │   ├── src/
+│   │   ├── pages/          # Page components with routing
+│   │   │   ├── HomePage.tsx          # Quiz selection
+│   │   │   ├── QuizPage.tsx          # Quiz taking
+│   │   │   ├── ResultPage.tsx        # Results display
+│   │   │   ├── AdminDashboard.tsx    # Admin panel
+│   │   │   ├── QuizManagementPage.tsx      # Manage quizzes
+│   │   │   ├── QuizFormPage.tsx            # Create/Edit quiz
+│   │   │   ├── QuestionManagementPage.tsx  # Manage questions
+│   │   │   └── QuestionFormPage.tsx        # Create/Edit question
 │   │   ├── components/      # React components
-│   │   │   ├── ui/         # Reusable UI components
+│   │   │   ├── ui/                # Reusable UI components
+│   │   │   ├── Layout.tsx         # Main layout
 │   │   │   ├── QuizStart.tsx
 │   │   │   ├── QuizQuestion.tsx
 │   │   │   └── QuizResult.tsx
-│   │   ├── store/          # Zustand store
+│   │   ├── store/          # Zustand store with CRUD
 │   │   ├── types/          # TypeScript types
 │   │   ├── lib/            # Utilities
-│   │   ├── App.tsx         # Main app component
+│   │   ├── App.tsx         # Router setup
 │   │   └── main.tsx        # Entry point
 │   └── package.json
 ├── package.json            # Root package for scripts
@@ -218,6 +237,8 @@ Quiz Application/
 ```
 
 ## 🎯 Usage
+
+### Taking a Quiz
 
 1. **Start the application** using `npm run dev`
 2. **Open your browser** to `http://localhost:5173`
@@ -227,6 +248,38 @@ Quiz Application/
 6. **Submit** when all questions are answered
 7. **View results** with correct/incorrect answers highlighted
 8. **Restart** to take another quiz
+
+### Admin Panel
+
+The application includes a full-featured admin panel accessible via the "Admin" button in the navbar:
+
+**Access:** Click "Admin" button or navigate to `http://localhost:5173/admin`
+
+**Features:**
+- 📝 **Create Quizzes** - `/admin/quizzes/new`
+- ✏️ **Edit Quizzes** - Edit title, description, difficulty, etc.
+- 🗑️ **Delete Quizzes** - Remove quizzes with confirmation
+- ➕ **Add Questions** - `/admin/questions/new`
+- ✏️ **Edit Questions** - Update question text and options
+- 🗑️ **Delete Questions** - Remove questions with confirmation
+
+### Routes
+
+#### User Routes
+- `/` - Home page (quiz selection)
+- `/quiz/:quizId` - Take a quiz
+- `/result` - View quiz results
+
+#### Admin Routes
+- `/admin` - Admin dashboard
+- `/admin/quizzes` - Manage all quizzes
+- `/admin/quizzes/new` - Create new quiz
+- `/admin/quizzes/edit/:quizId` - Edit quiz
+- `/admin/questions` - Manage questions
+- `/admin/questions/new` - Create question
+- `/admin/questions/edit/:questionId` - Edit question
+
+**See [PAGES_STRUCTURE.md](PAGES_STRUCTURE.md) for detailed page documentation.**
 
 ## 🔧 Development Tools
 

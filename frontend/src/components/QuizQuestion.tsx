@@ -66,7 +66,7 @@ export function QuizQuestion({
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl shadow-lg">
         <CardHeader className="space-y-4">
           <div className="flex justify-between items-center text-sm text-slate-600">

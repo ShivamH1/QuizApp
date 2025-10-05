@@ -27,7 +27,7 @@ export function QuizResult({ result, onRestart }: QuizResultProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-4xl space-y-6">
         <Card className="shadow-lg">
           <CardHeader className="text-center space-y-4">

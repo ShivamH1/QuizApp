@@ -1,74 +1,39 @@
-import { useEffect } from 'react';
-import { useQuizStore } from './store/quizStore';
-import { QuizStart } from './components/QuizStart';
-import { QuizQuestion } from './components/QuizQuestion';
-import { QuizResult } from './components/QuizResult';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from './components/ui/sonner';
+import { Layout } from './components/Layout';
+import {
+  HomePage,
+  QuizPage,
+  ResultPage,
+  AdminDashboard,
+  QuizManagementPage,
+  QuizFormPage,
+  QuestionManagementPage,
+  QuestionFormPage,
+} from './pages';
 import './App.css';
 
 function App() {
-  const {
-    quizzes,
-    questions,
-    currentQuestionIndex,
-    answers,
-    quizResult,
-    isLoading,
-    isSubmitting,
-    startTime,
-    fetchQuizzes,
-    fetchQuestions,
-    setAnswer,
-    nextQuestion,
-    previousQuestion,
-    submitQuiz,
-    resetQuiz,
-    startTimer,
-    updateTimeElapsed,
-  } = useQuizStore();
+  return (
+    <Router>
+      <Layout>
+        <Routes>
+          {/* User Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/quiz/:quizId" element={<QuizPage />} />
+          <Route path="/result" element={<ResultPage />} />
 
-  useEffect(() => {
-    fetchQuizzes();
-  }, [fetchQuizzes]);
-
-  const hasStarted = questions.length > 0;
-  const currentQuestion = questions[currentQuestionIndex];
-
-  const handleSelectQuiz = async (quizId: string) => {
-    await fetchQuestions(quizId);
-    startTimer();
-  };
-
-  const handleRestart = () => {
-    resetQuiz();
-  };
-
-  if (quizResult) {
-    return <QuizResult result={quizResult} onRestart={handleRestart} />;
-  }
-
-  if (!hasStarted) {
-    return <QuizStart quizzes={quizzes} onSelectQuiz={handleSelectQuiz} isLoading={isLoading} />;
-  }
-
-  if (currentQuestion) {
-    return (
-      <QuizQuestion
-        question={currentQuestion}
-        currentIndex={currentQuestionIndex}
-        totalQuestions={questions.length}
-        selectedAnswer={answers[currentQuestion.id]}
-        onAnswerSelect={(option) => setAnswer(currentQuestion.id, option)}
-        onNext={nextQuestion}
-        onPrevious={previousQuestion}
-        onSubmit={submitQuiz}
-        isSubmitting={isSubmitting}
-        startTime={startTime}
-        onTimeUpdate={updateTimeElapsed}
-      />
-    );
-  }
-
-  return null;
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/quizzes" element={<QuizManagementPage />} />
+          <Route path="/admin/quizzes/:quizId" element={<QuizFormPage />} />
+          <Route path="/admin/questions" element={<QuestionManagementPage />} />
+          <Route path="/admin/questions/:questionId" element={<QuestionFormPage />} />
+        </Routes>
+        <Toaster />
+      </Layout>
+    </Router>
+  );
 }
 
 export default App;
