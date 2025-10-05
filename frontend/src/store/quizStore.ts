@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { Question, OptionKey, QuizResult, Quiz } from '../types/quiz';
+import axiosInstance from '../lib/axios';
 
 export interface CreateQuizData {
   title: string;
@@ -74,8 +75,6 @@ interface QuizState {
   deleteQuestion: (id: string) => Promise<void>;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
-
 export const useQuizStore = create<QuizState>((set, get) => ({
   quizzes: [],
   selectedQuizId: null,
@@ -92,12 +91,8 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   fetchQuizzes: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE_URL}/quizzes`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch quizzes');
-      }
-      const data = await response.json();
-      set({ quizzes: data, isLoading: false });
+      const response = await axiosInstance.get('/quizzes');
+      set({ quizzes: response.data, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'An error occurred',
@@ -113,12 +108,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   fetchQuestions: async (quizId: string) => {
     set({ isLoading: true, error: null, selectedQuizId: quizId });
     try {
-      const response = await fetch(`${API_BASE_URL}/questions?quizId=${quizId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch questions');
-      }
-      const data = await response.json();
-      set({ questions: data, isLoading: false });
+      const response = await axiosInstance.get('/questions', {
+        params: { quizId }
+      });
+      set({ questions: response.data, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'An error occurred',
@@ -156,20 +149,12 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     set({ isSubmitting: true, error: null });
 
     try {
-      const response = await fetch(`${API_BASE_URL}/submit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ answers, timeTaken: timeElapsed, quizId: selectedQuizId }),
+      const response = await axiosInstance.post('/submit', {
+        answers,
+        timeTaken: timeElapsed,
+        quizId: selectedQuizId
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit quiz');
-      }
-
-      const result = await response.json();
-      set({ quizResult: result, isSubmitting: false });
+      set({ quizResult: response.data, isSubmitting: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'An error occurred',
@@ -203,19 +188,8 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   createQuiz: async (data: CreateQuizData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE_URL}/quizzes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create quiz');
-      }
-
-      const newQuiz = await response.json();
+      const response = await axiosInstance.post('/quizzes', data);
+      const newQuiz = response.data;
       set(state => ({
         quizzes: [...state.quizzes, newQuiz],
         isLoading: false,
@@ -233,19 +207,8 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   updateQuiz: async (id: string, data: UpdateQuizData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE_URL}/quizzes/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update quiz');
-      }
-
-      const updatedQuiz = await response.json();
+      const response = await axiosInstance.put(`/quizzes/${id}`, data);
+      const updatedQuiz = response.data;
       set(state => ({
         quizzes: state.quizzes.map(quiz =>
           quiz.id === id ? updatedQuiz : quiz
@@ -265,14 +228,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   deleteQuiz: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE_URL}/quizzes/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete quiz');
-      }
-
+      await axiosInstance.delete(`/quizzes/${id}`);
       set(state => ({
         quizzes: state.quizzes.filter(quiz => quiz.id !== id),
         isLoading: false,
@@ -290,17 +246,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   createQuestion: async (data: CreateQuestionData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE_URL}/questions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create question');
-      }
+      await axiosInstance.post('/questions', data);
 
       // If the question belongs to the currently selected quiz, refetch questions
       const { selectedQuizId } = get();
@@ -321,19 +267,8 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   updateQuestion: async (id: string, data: UpdateQuestionData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE_URL}/questions/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update question');
-      }
-
-      const updatedQuestion = await response.json();
+      const response = await axiosInstance.put(`/questions/${id}`, data);
+      const updatedQuestion = response.data;
       set(state => ({
         questions: state.questions.map(question =>
           question.id === id ? { ...question, ...updatedQuestion } : question
@@ -352,14 +287,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   deleteQuestion: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`${API_BASE_URL}/questions/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete question');
-      }
-
+      await axiosInstance.delete(`/questions/${id}`);
       set(state => ({
         questions: state.questions.filter(question => question.id !== id),
         isLoading: false,
