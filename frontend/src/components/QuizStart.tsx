@@ -25,7 +25,7 @@ export function QuizStart({ quizzes, onSelectQuiz, isLoading }: QuizStartProps) 
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-lg">
           <CardContent className="p-8 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
@@ -37,7 +37,7 @@ export function QuizStart({ quizzes, onSelectQuiz, isLoading }: QuizStartProps) 
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
       <div className="w-full max-w-5xl">
         <div className="text-center mb-8">
           <div className="mx-auto w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center mb-4">

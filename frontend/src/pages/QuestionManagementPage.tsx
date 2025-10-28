@@ -54,7 +54,7 @@ export function QuestionManagementPage() {
   const selectedQuiz = quizzes.find((q) => q.id === selectedQuizId);
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-[calc(100vh-64px)] p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <Button variant="outline" onClick={() => navigate('/admin')} className="mb-4">
@@ -107,10 +107,12 @@ export function QuestionManagementPage() {
             </CardContent>
           </Card>
         ) : isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-slate-600">Loading questions...</p>
-          </div>
+          <Card className="shadow-lg">
+            <CardContent className="py-12 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-slate-600">Loading questions...</p>
+            </CardContent>
+          </Card>
         ) : (
           <>
             {selectedQuiz && (
